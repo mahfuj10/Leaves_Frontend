@@ -1,0 +1,15 @@
+/* group */
+.creatGroupBtn {
+  display: block;
+  border-radius: 25px;
+  border: none;
+  letter-spacing: 1px;
+  padding: 10px 100px;
+  background-image: -webkit-gradient(linear, left top, right top, from(#5C4F81), to(#5C4F81));
+  background-image: linear-gradient(to right, #5C4F81, #5C4F81);
+  color: white;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+/*# sourceMappingURL=Groups.css.map */

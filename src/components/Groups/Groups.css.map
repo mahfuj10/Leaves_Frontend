@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,WAAW;AACX,AAAA,cAAc,CAAC;EACX,OAAO,EAAE,KAAK;EACd,aAAa,EAAE,IAAI;EACnB,MAAM,EAAE,IAAI;EACZ,WAAW,EAAE,IAAI;EACjB,cAAc,EAAE,GAAG;EACnB,OAAO,EAAE,UAAU;EACnB,gBAAgB,EAAE,2CAA2C;EAC7D,KAAK,EAAE,KAAK;EACZ,UAAU,EAAE,IAAI;EAChB,aAAa,EAAE,IAAI;CACtB",
+    "sources": [
+        "Groups.scss"
+    ],
+    "names": [],
+    "file": "Groups.css"
+}
