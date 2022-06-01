@@ -145,14 +145,17 @@ function Home() {
                 anchor="left"
                 open={openDrawer}
             >
-                <CloseIcon
+                <IconButton
                     onClick={handleDrawerClose}
                     sx={{
                         mt: 3,
                         color: "#fff",
-                        ml: 1
-                    }}
-                />
+                        ml: 1,
+                        width: 40,
+                        height: 40
+                    }}>
+                    <CloseIcon />
+                </IconButton>
 
                 {
                     openSidebar === 10 && <AddContracts

@@ -1,7 +1,7 @@
 #body {
     background-image: linear-gradient(to right, #4E426D, #4E426D);
     font-family: 'Montserrat', sans-serif;
-    overflow-y: scroll;
+    overflow-y: hidden;
     overflow-x: hidden;
 }
 
@@ -26,8 +26,7 @@
 body {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
+
     box-sizing: border-box;
     overflow-x: hidden;
 }
@@ -325,7 +324,7 @@ body {
     position: absolute;
     transition: 1s;
     transform: translateY(-2rem);
-    margin-top: -10px;
+    margin-top: -100px;
 }
 
 /* ---------------
@@ -393,6 +392,14 @@ body {
 
 }
 
+#bottom_nav {
+    position: fixed;
+    bottom: 0;
+    background-color: #5C4F81;
+    /* z-index: 99999999999999999; */
+    margin-bottom: 0px;
+}
+
 
 
 @media only screen and (max-width: 750px) {
@@ -400,7 +407,7 @@ body {
         position: fixed;
         bottom: 0;
         /* z-index: 99999999999999999; */
-        margin-bottom: 10px;
+        margin-bottom: 0px;
     }
 
     #emtyContactText {
@@ -417,6 +424,8 @@ body {
         font-size: 10px !important;
         letter-spacing: 0px !important;
     }
+
+
 }
 
 /* @media only screen and (min-width: 751px) {

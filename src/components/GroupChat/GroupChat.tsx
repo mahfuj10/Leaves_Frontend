@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../Redux/hooks';
 import { Box, IconButton, CircularProgress, Avatar, Typography, ListItem } from '@mui/material';
 import { IoMdSend } from 'react-icons/io';
@@ -30,16 +30,17 @@ export const GroupChat = (props: Props) => {
     const [loading, setLoading] = useState(true);
     const [typeingUser, setTypeingUser] = useState<any[]>([]);
     const dispatch = useAppDispatch();
+    const chatWidth = useRef<any>();
 
     useEffect(() => {
-        setLoading(true);
+        // setLoading(true);
         axios.get(`https://enigmatic-garden-12643.herokuapp.com/group/groupchat/${selectedGroup.groupId}`)
             .then(res => {
                 setLoading(false);
                 dispatch(getGroupChat(res.data));
                 setMessageList(res.data);
             });
-    }, [groupId, selectedGroup, allMessageDeleteLoading])
+    }, [groupId, selectedGroup, allMessageDeleteLoading, messageList])
 
 
     // message data
@@ -55,14 +56,14 @@ export const GroupChat = (props: Props) => {
 
         };
         try {
+            await socket.current.emit("send_message", messageData);
+            setMessageList((list) => [...list, messageData]);
             await axios.post(`https://enigmatic-garden-12643.herokuapp.com/chat`, messageData);
             setPhotoUrl('');
         } catch (err) {
             console.error(err)
         }
 
-        await socket.current.emit("send_message", messageData);
-        setMessageList((list) => [...list, messageData]);
         setPhotoUrl('');
         setCurrentMessage("");
     };
@@ -105,14 +106,12 @@ export const GroupChat = (props: Props) => {
 
     useEffect(() => {
         socket.current?.on("recive_message", (data: any) => {
-
-
-            const upcomeingMessages: any[] = [...messageList, data];
+            setMessageList([...messageList, data]);
+            // const upcomeingMessages: any[] = [...messageList, data];
             setTypeingUser([]);
-            setMessageList(upcomeingMessages);
             // setMessageList((list) => [...list, data]);
         })
-    }, [socket, messageList])
+    }, [messageList, socket?.current, selectedGroup])
 
     // user typeing message function
     const userData = { name: loginUser.displayName, photo: loginUser.photoURL, roomId: groupId, uid: loginUser.uid }
@@ -133,11 +132,11 @@ export const GroupChat = (props: Props) => {
         })
         socket?.current?.on('typing', function (data: any) {
             setTypeingUser([...typeingUser, data]);
-        })
+        });
         socket?.current?.on("deleteMessage", function (data: any) {
             const filterMessages = messageList?.filter(message => message._id !== data._id);
             setMessageList(filterMessages);
-        })
+        });
         if (currentMessage === '') {
             socket?.current?.emit('typing', {});
         }
@@ -146,36 +145,37 @@ export const GroupChat = (props: Props) => {
 
     // stylesheet
     const textArea = {
-        width: '100%',
+        width: chatWidth.current?.scrollWidth,
         height: 60,
         background: "#4E426D",
         borderRadius: 10,
-        marginBottom: 5
+        marginBottom: 5,
+        color: 'white'
     };
 
+    const chatHeader = {
+        boxShadow: 0,
+        width: "100%",
+        background: "#4E426D",
+        ml: { xs: 0, md: 4 },
+        mt: { xs: 0, md: 4 },
+        mb: 0,
+        p: 1.3,
+        display: { xs: 'block', md: 'flex' },
+        justifyContent: 'space-between'
+    };
 
 
     return (
 
-        <>
-
-            <Box sx={{
-                boxShadow: 0,
-                width: "100%",
-                background: "#4E426D",
-                ml: { xs: 0, md: 4 },
-                mt: { xs: 0, md: 4 },
-                mb: 0,
-                p: 1.3,
-                display: { xs: 'block', md: 'flex' },
-                justifyContent: 'space-between'
-            }}>
+        <Box sx={{ height: window.screen.height }}>
+            <Box sx={chatHeader}>
 
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Avatar alt="userimage" src={selectedGroup.coverPhoto} />
+                    <Avatar alt="coverimage" src={selectedGroup?.coverPhoto} />
                     <span>
-                        <Typography sx={{ fontSize: 15, color: "#fff" }} variant="h6">{selectedGroup.groupName}</Typography>
-                        <small style={{ color: "#ddd6d6" }}>Online</small>
+                        <Typography sx={{ fontSize: 15, color: "#fff" }} variant="h6">{selectedGroup?.groupName}</Typography>
+                        <small style={{ color: "#ddd6d6" }}>...</small>
                     </span>
                 </Box>
 
@@ -193,33 +193,33 @@ export const GroupChat = (props: Props) => {
 
             {/* messages  */}
 
-            <Box sx={{ p: 4 }}>
+            <Box sx={{ p: 4, height: { xs: '70%', md: '70%', lg: "70%" } }}>
 
                 {
                     loading && <Box sx={{
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        height: '485px'
+                        height: '100%'
                     }}>
                         <FacebookCircularProgress />
                     </Box>
                 }
 
-                <Box className="message_container" sx={{ height: { xs: '30rem', md: '34rem', xl: 680 } }}>
 
 
-                    {
-                        messageList?.length === 0 && !loading && <Box sx={{ mt: 5 }}>
+                {
+                    messageList?.length === 0 && !loading && <Box sx={{ mt: 5 }}>
 
-                            <Avatar alt="userimage" sx={{ height: 80, width: 80, m: '0 auto' }} src={selectedGroup.coverPhoto} />
+                        <Avatar alt="userimage" sx={{ height: 80, width: 80, m: '0 auto' }} src={selectedGroup.coverPhoto} />
 
-                            <Typography sx={{ textAlign: 'center', color: 'whitesmoke' }} variant="h6">{selectedGroup.groupName}</Typography>
+                        <Typography sx={{ textAlign: 'center', color: 'whitesmoke' }} variant="h6">{selectedGroup.groupName}</Typography>
 
-                        </Box>
-                    }
+                    </Box>
+                }
 
 
+                <Box ref={chatWidth} sx={{ height: '100%', overflowY: 'scroll' }}>
                     {
                         !loading && <ScrollToBottom>
                             {
@@ -231,15 +231,17 @@ export const GroupChat = (props: Props) => {
                             }
                         </ScrollToBottom>
                     }
+
                 </Box>
 
-
             </Box>
+
+
 
             {/* typeing user */}
             <Box>
                 {
-                    typeingUser?.map((user: any) => <Box>
+                    typeingUser?.map((user: any) => <Box key={user._id}>
                         {
                             user?.name && groupId === user?.roomId && <Box id="typeing_user">
 
@@ -247,7 +249,7 @@ export const GroupChat = (props: Props) => {
 
                                     <Avatar sx={{ width: 18, height: 18 }} src={user?.photo} alt={user?.name} />
 
-                                    <Typography sx={{ color: '#fff' }} variant='caption'>{user?.name} is typeing...</Typography>
+                                    <Typography sx={{ color: '#fff' }} variant='caption'>{user?.name} is typing...</Typography>
 
                                 </ListItem>
 
@@ -261,7 +263,7 @@ export const GroupChat = (props: Props) => {
             {/* send message section */}
             {!loading &&
 
-                <Box sx={{ p: 4, mb: 3.5 }} id="bottom_nav">
+                <Box sx={{ px: 4, pb: 1 }} id="bottom_nav">
 
                     {
                         photoUrl !== '' &&
@@ -278,7 +280,7 @@ export const GroupChat = (props: Props) => {
                         id="message_field"
                         style={textArea}
                     />
-
+                    <br />
 
                     <Box sx={{ mt: 0, float: "right" }}>
 
@@ -313,6 +315,6 @@ export const GroupChat = (props: Props) => {
                 </Box>
 
             }
-        </>
+        </Box>
     )
 }

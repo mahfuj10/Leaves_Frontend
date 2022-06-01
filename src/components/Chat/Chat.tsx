@@ -1,5 +1,5 @@
 import { Avatar, Box, CircularProgress, IconButton, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { IoMdSend } from 'react-icons/io';
 import ScrollToBottom from "react-scroll-to-bottom";
 import { MdCameraAlt } from 'react-icons/md';
@@ -28,7 +28,7 @@ function Chat({ socket, roomId }: any) {
     const [textLoading, setTextLoading] = useState<boolean>(false);
     const [notifications, setNotifications] = useState<any[]>([]);
     const [audio] = useState(new Audio('../../utlis/message.mp3'));
-
+    const chatWidth = useRef<any>();
 
 
     // load message 
@@ -179,10 +179,18 @@ function Chat({ socket, roomId }: any) {
         justifyContent: 'space-between'
     };
 
+    const textArea = {
+        width: chatWidth.current?.scrollWidth,
+        height: 60,
+        background: "#4E426D",
+        borderRadius: 10,
+        marginBottom: 5,
+        color: "white"
+    };
 
     return (
 
-        <>
+        <Box style={{ height: window.screen.height }}>
             {/* chat header */}
 
 
@@ -197,7 +205,7 @@ function Chat({ socket, roomId }: any) {
                             {selectedUser.displayName}
                         </Typography>
 
-                        <small style={{ color: "#ddd6d6" }}>Online</small>
+                        <small style={{ color: "#ddd6d6" }}>...</small>
 
                     </span>
 
@@ -215,31 +223,35 @@ function Chat({ socket, roomId }: any) {
 
             {/* messages  */}
 
-            <Box sx={{ p: 4 }}>
+            <Box sx={{ p: 4, height: { xs: '70%', md: '70%', lg: "70%" } }}>
 
                 {
                     messageDataLoading && <Box sx={{
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        height: { xs: '30rem', md: '34rem', xl: 680 }
+                        height: '100%'
                     }}>
                         <FacebookCircularProgress />
                     </Box>
                 }
 
-                <Box className="message_container" sx={{ height: { xs: '30rem', md: '34rem', xl: 680 } }}>
 
 
-                    {
-                        messageList?.length === 0 && !messageDataLoading && <Box className='' sx={{ mt: 5, height: { xl: 680, md: 350, lg: 450 } }}>
+                {
+                    messageList?.length === 0 && !messageDataLoading && <Box className='' sx={{ mt: 5, }}>
 
-                            <Avatar alt="userimage" sx={{ height: 80, width: 80, m: '0 auto' }} src={selectedUser.photoURL} />
+                        <Avatar alt="userimage" sx={{ height: 80, width: 80, m: '0 auto' }} src={selectedUser.photoURL} />
 
-                            <Typography sx={{ textAlign: 'center', color: 'whitesmoke' }} variant="h6">{selectedUser.displayName}</Typography>
+                        <Typography sx={{ textAlign: 'center', color: 'whitesmoke' }} variant="h6">{selectedUser.displayName}</Typography>
 
-                        </Box>
-                    }
+                    </Box>
+                }
+
+
+
+                <Box ref={chatWidth} sx={{ height: '100%', overflowY: 'scroll' }}>
+
 
 
                     {
@@ -271,7 +283,7 @@ function Chat({ socket, roomId }: any) {
             {/* send message section */}
             {!messageDataLoading &&
 
-                <Box sx={{ p: 4, mb: 4 }} id="bottom_nav">
+                <Box sx={{ px: 4, pb: 1 }} id="bottom_nav">
 
 
                     {
@@ -288,15 +300,10 @@ function Chat({ socket, roomId }: any) {
                         placeholder='Enter a Message'
                         value={currentMessage}
                         id="message_field"
-                        style={{
-                            width: '100%',
-                            height: 60,
-                            background: "#4E426D",
-                            borderRadius: 10,
-                            marginBottom: 5
-                        }}
+                        style={textArea}
                     />
 
+                    <br />
 
                     <Box sx={{ mt: 0, float: "right" }}>
 
@@ -333,7 +340,7 @@ function Chat({ socket, roomId }: any) {
 
             }
 
-        </>
+        </Box>
 
     )
 }

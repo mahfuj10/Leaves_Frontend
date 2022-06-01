@@ -17,7 +17,7 @@ function Group({ group, handleAddRoomId, socket, mygroups }: any) {
 
 
     const members: any[] = [];
-    const { groupName, groupId, coverPhoto } = group;
+    // const { groupName, groupId, coverPhoto } = group;
     const { allUsers, allGroups, selectedGroup } = useAppSelector(state => state.data);
     const dispatch = useAppDispatch();
 
@@ -55,7 +55,7 @@ function Group({ group, handleAddRoomId, socket, mygroups }: any) {
 
         <>
             {
-                groupName && <Box
+                group?.groupName && <Box
                     sx={{
                         display: 'flex',
                         gap: 1.5,
@@ -69,11 +69,11 @@ function Group({ group, handleAddRoomId, socket, mygroups }: any) {
 
                 >
 
-                    <Avatar src={coverPhoto} alt={groupName} sx={{ borderRadius: 1, width: 50, height: 50, my: 0.3 }} />
+                    <Avatar src={group?.coverPhoto} alt={group?.groupName} sx={{ borderRadius: 1, width: 50, height: 50, my: 0.3 }} />
 
                     <Box>
 
-                        <Typography variant='h6' sx={{ fontSize: 17, letterSpacing: 1, color: 'whitesmoke' }}>{groupName}</Typography>
+                        <Typography variant='h6' sx={{ fontSize: 17, letterSpacing: 1, color: 'whitesmoke' }}>{group?.groupName}</Typography>
 
                         <AvatarGroup className='avatar_container' max={5} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                             {
